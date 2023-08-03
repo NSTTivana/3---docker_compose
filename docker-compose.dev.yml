@@ -1,0 +1,34 @@
+version: '3.8'
+#ตั้งชื่อ services
+services:
+  #ชื่อ container
+  db:
+    image: mongo:6.0.2
+    #27017 port หลักของทาง mongo port สื่อสารระหว่าง docker ยัง windows or linux
+    #ports: - 27017:27017
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+  web:
+    build: .
+    #RUN START ฝั่ง Dev
+    command: npm run start:dev
+    #เปรียบเสมือนการใช้ -e อีกรูปแบบหนึ่ง
+    #volumes .: เมื่่อ save code เสร็จแล้วก็รีโมทไป .PATH ทางเครืองเรา PATH Docker:/usr/src/app จากWORKDIR
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - PORT=3000
+      #localhost ฝั่งอยู่ใน App ที่ชื่อว่า 1
+      - MONGODB_URL=mongodb://db:27017/mydb
+    #เมื่อถูกสั่งให้ stop หรือ มี error container จะกลับมาเปิกอัตโนมัติ
+    ports:
+      - 3000:3000
+     #depends หมายถึง ถ้า DB=dbmongo ไม่เปิด ตัว app=web จะไม่ทำงาน 
+    depends_on:
+      - db
+
+volumes:
+  mongo_data:

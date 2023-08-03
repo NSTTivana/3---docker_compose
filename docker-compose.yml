@@ -1,0 +1,31 @@
+version: '3.8' #anavit.ko
+#ตั้งชื่อ services
+services:
+  #ชื่อ container
+  db:
+    image: mongo:6.0.2
+    #27017 port หลักของทาง mongo port สื่อสารระหว่าง docker ยัง windows or linux
+    #ports: - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=myuser
+      - MONGO_INITDB_ROOT_PASSWORD=mypass
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+  web:
+    build: .
+    #เปรียบเสมือนการใช้ -e อีกรูปแบบหนึ่ง
+    environment:
+      - PORT=3000
+      #localhost ฝั่งอยู่ใน App ที่ชื่อว่า 1
+      - MONGODB_URL=mongodb://myuser:mypass@db:27017/mydb?authSource=admin
+    #เมื่อถูกสั่งให้ stop หรือ มี error container จะกลับมาเปิกอัตโนมัติ
+    ports:
+      - 3000:3000
+     #depends หมายถึง ถ้า DB=dbmongo ไม่เปิด ตัว app=web จะไม่ทำงาน 
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  mongo_data:

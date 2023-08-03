@@ -1,0 +1,4 @@
+#ignore //anavit.ko
+#sec
+#ไม่รวมอยู่ใน context / fast build images
+node_modules/
